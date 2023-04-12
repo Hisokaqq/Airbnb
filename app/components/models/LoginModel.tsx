@@ -4,7 +4,7 @@ import { AiFillGithub } from "react-icons/ai"
 import {FcGoogle} from "react-icons/fc"
 
 import useLoginModal from "@/app/hooks/useLoginModel"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import {useForm, FieldValues, SubmitHandler} from "react-hook-form"
 import Model from "./Model"
 import Heading from "../Heading"
@@ -13,8 +13,10 @@ import { toast } from "react-hot-toast"
 import Button from "../Button"
 import {signIn} from "next-auth/react"
 import { useRouter } from "next/navigation"
+import useRegisterModal from "@/app/hooks/useRegisterModel"
 const LoginModel = () => {
     const loginModel = useLoginModal()
+    const registerModel = useRegisterModal()
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
     const {
@@ -49,6 +51,11 @@ const LoginModel = () => {
             }
         })
     }   
+
+    const toggle = useCallback(()=>{
+        loginModel.onClose()
+        registerModel.onOpen()
+    },[loginModel, registerModel])
     const bodyContent = (
         <div className="flex flex-col gap-4">
             <Heading title="Welcome back" subtitle="Login to your account!"  />
@@ -64,10 +71,10 @@ const LoginModel = () => {
             <div className="text-neutral-500 text-center mt-4 font-light">
                 <div className="flex justify-center flex-row items-center gap-2">
                     <div>
-                        already have an account?
+                        First time using Airbnb?
                     </div>
-                    <div className="text-neutral-800 cursor-pointer hover:underline" onClick={loginModel.onClose}>
-                        Log In
+                    <div className="text-neutral-800 cursor-pointer hover:underline" onClick={toggle}>
+                        Create an accunt
                     </div>
                 </div>
             </div>
