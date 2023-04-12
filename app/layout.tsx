@@ -6,6 +6,7 @@ import { Nunito } from 'next/font/google'
 import ToasterProvider from './providers/ToasterProvider'
 import LoginModel from './components/models/LoginModel'
 import getCurrentUser from './actions/getCurrentUser'
+import RentModel from './components/models/RentModel'
 export const metadata = {
   title: 'Airbnb',
   description: 'Hotel Booking',
@@ -27,6 +28,7 @@ export default async function RootLayout({
       <body className={font.className}>
         {/* <Model isOpan={true} title='Login'/> */}
         <ToasterProvider/>
+        <RentModel/>
         <RegisterModel/>
         <LoginModel/>
         <Navbar currentUser={currentUser}/> 
