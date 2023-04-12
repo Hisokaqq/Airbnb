@@ -3,7 +3,7 @@ import axios from "axios"
 import { AiFillGithub } from "react-icons/ai"
 import {FcGoogle} from "react-icons/fc"
 
-import useRegisterModal from "@/app/hooks/useRegisterModel"
+import useLoginModal from "@/app/hooks/useLoginModel"
 import { useState } from "react"
 import {useForm, FieldValues, SubmitHandler} from "react-hook-form"
 import Model from "./Model"
@@ -11,10 +11,11 @@ import Heading from "../Heading"
 import Input from "../inputs/Input"
 import { toast } from "react-hot-toast"
 import Button from "../Button"
-import { signIn } from "next-auth/react"
-
-const RegisterModel = () => {
-    const registerModel = useRegisterModal()
+import {signIn} from "next-auth/react"
+import { useRouter } from "next/navigation"
+const LoginModel = () => {
+    const loginModel = useLoginModal()
+    const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
     const {
         register,
@@ -24,7 +25,6 @@ const RegisterModel = () => {
         }
     } = useForm<FieldValues>({
         defaultValues: {
-            name: "",
             email: "",
             password: "",
         }
@@ -32,21 +32,27 @@ const RegisterModel = () => {
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         setIsLoading(true)
-        axios.post("/api/register", data).then(()=>{
-            registerModel.onClose();
+        signIn("credentials", {
+            ...data,
+            redirect: false,
         })
-        .catch((error) => {
-            toast.error("something went wrong")
-        })
-        .finally(()=>{
+        .then((callback)=>{
             setIsLoading(false)
+            if(callback?.ok){
+                toast.success("Logged In")
+                router.refresh
+                loginModel.onClose()
+            }
+
+            if(callback?.error){
+                toast.error(callback.error)
+            }
         })
     }   
     const bodyContent = (
         <div className="flex flex-col gap-4">
-            <Heading title="Welcome to Airbnb" subtitle="Create an account!"  />
+            <Heading title="Welcome back" subtitle="Login to your account!"  />
             <Input id="email" label="Email" disabled={isLoading}  register={register} required errors={errors}/>
-            <Input id="name" label="Name" disabled={isLoading}  register={register} required errors={errors}/>
             <Input id="password" label="Password" type="password" disabled={isLoading}  register={register} required errors={errors}/>
         </div>
     )
@@ -60,7 +66,7 @@ const RegisterModel = () => {
                     <div>
                         already have an account?
                     </div>
-                    <div className="text-neutral-800 cursor-pointer hover:underline" onClick={registerModel.onClose}>
+                    <div className="text-neutral-800 cursor-pointer hover:underline" onClick={loginModel.onClose}>
                         Log In
                     </div>
                 </div>
@@ -68,8 +74,8 @@ const RegisterModel = () => {
         </div>
     )
    return (
-    <Model disabled={isLoading} isOpan={registerModel.isOpen} onClose={registerModel.onClose} title="register" actionLabel="Continue" onSubmit={handleSubmit(onSubmit)} body={bodyContent}  footer={footerContent}/>
+    <Model disabled={isLoading} isOpan={loginModel.isOpen} onClose={loginModel.onClose} title="Login" actionLabel="Continue" onSubmit={handleSubmit(onSubmit)} body={bodyContent}  footer={footerContent}/>
   )
 }
 
-export default RegisterModel
+export default LoginModel

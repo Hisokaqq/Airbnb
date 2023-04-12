@@ -4,6 +4,8 @@ import Navbar from './components/navbar/Navbar'
 import './globals.css'
 import { Nunito } from 'next/font/google'
 import ToasterProvider from './providers/ToasterProvider'
+import LoginModel from './components/models/LoginModel'
+import getCurrentUser from './actions/getCurrentUser'
 export const metadata = {
   title: 'Airbnb',
   description: 'Hotel Booking',
@@ -12,18 +14,22 @@ export const metadata = {
 const font = Nunito({
   subsets: ["latin"]
 })
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+
+  const currentUser = await getCurrentUser()
+
   return (
     <html lang="en">
       <body className={font.className}>
         {/* <Model isOpan={true} title='Login'/> */}
         <ToasterProvider/>
         <RegisterModel/>
-        <Navbar/> 
+        <LoginModel/>
+        <Navbar currentUser={currentUser}/> 
         {children}
 
         </body>
